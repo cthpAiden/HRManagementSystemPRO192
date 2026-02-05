@@ -1,0 +1,189 @@
+cd "C:\Users\DELL\Desktop\PE Sandbox\HRMS"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@startuml
+
+' --- 1. CẤU HÌNH GIAO DIỆN (Làm sạch đường dây) ---
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+' Tăng khoảng cách giữa các node để dây không dính chùm
+skinparam nodesep 100
+skinparam ranksep 80
+
+' --- 2. KHAI BÁO CLASS (Giữ nguyên 100% nội dung của bạn) ---
+
+package "Entities" {
+    class Employee {
+        - id : String
+        - name : String
+        - department : String
+        - jobTitle : String
+        - joiningDate : LocalDate
+        - basicSalary : double
+        - isFullTime : boolean
+        + Employee(...)
+        + getId() : String
+        + setId(id : String) : void
+        + getName() : String
+        + setName(name : String) : void
+        + getDepartment() : String
+        + setDepartment(department : String) : void
+        + getJobTitle() : String
+        + setJobTitle(jobTitle : String) : void
+        + getJoiningDate() : LocalDate
+        + setJoiningDate(joiningDate : LocalDate) : void
+        + getBasicSalary() : double
+        + setBasicSalary(salary : double) : void
+        + isFullTime() : boolean
+        + setFullTime(isFullTime : boolean) : void
+        + toString() : String
+    }
+
+    class Attendance {
+        - employeeId : String
+        - date : LocalDate
+        - status : String
+        - overtimeHours : double
+        + Attendance(...)
+        + getEmployeeId() : String
+        + getDate() : LocalDate
+        + getStatus() : String
+        + getOvertimeHours() : double
+        + toString() : String
+    }
+
+    class SalaryRecord {
+        - employeeId : String
+        - totalSalary : double
+        - month : int
+        - year : int
+        + SalaryRecord(...)
+        + getTotalSalary() : double
+        + toString() : String
+    }
+}
+
+package "Data Objects" {
+    class EmployeeDAO {
+        - list : List<Employee>
+        + addEmployee(e : Employee) : void
+        + getEmployees() : List<Employee>
+        + getEmployeeById(id : String) : Employee
+        + removeEmployee(e : Employee) : void
+    }
+
+    class AttendanceDAO {
+        - list : List<Attendance>
+        + addAttendance(a : Attendance) : void
+        + getAttendanceByEmployee(empId : String) : List<Attendance>
+        + isAttendanceExists(empId : String, date : LocalDate) : boolean
+    }
+}
+
+package "Utilities" {
+    class DataInput {
+        - {static} sc : Scanner
+        + {static} getInteger(msg : String) : int
+        + {static} getDouble(msg : String) : double
+        + {static} getString(msg : String) : String
+        + {static} getDate(msg : String) : LocalDate
+    }
+
+    class Menu {
+        + {static} print(options : String) : void
+    }
+}
+
+package "BusinessObject" {
+    class Program {
+        + {static} main(args : String[]) : void
+    }
+
+    class EmployeeManagement {
+        ~ dao : EmployeeDAO
+        + EmployeeManagement(dao : EmployeeDAO)
+        + process() : void
+        + addNew() : void
+        + list() : void
+        + remove() : void
+        + update() : void
+        + search() : void
+    }
+
+    class AttendanceManagement {
+        ~ attDAO : AttendanceDAO
+        ~ empDAO : EmployeeDAO
+        + AttendanceManagement(attDAO : AttendanceDAO, empDAO : EmployeeDAO)
+        + process() : void
+        + record() : void
+        + view() : void
+    }
+
+    class SalaryManagement {
+        ~ empDAO : EmployeeDAO
+        ~ attDAO : AttendanceDAO
+        + SalaryManagement(empDAO : EmployeeDAO, attDAO : AttendanceDAO)
+        + process() : void
+        + calculate() : void
+    }
+}
+
+' --- 3. SẮP XẾP VỊ TRÍ (Layout Hacks - Quan trọng nhất) ---
+' Ép các Management nằm ngang hàng
+EmployeeManagement -[hidden]right- SalaryManagement
+SalaryManagement -[hidden]right- AttendanceManagement
+
+' Ép các DAO nằm ngang hàng
+EmployeeDAO -[hidden]right- AttendanceDAO
+
+' Ép Entity nằm ngang hàng
+Employee -[hidden]right- SalaryRecord
+SalaryRecord -[hidden]right- Attendance
+
+' --- 4. VẼ MỐI QUAN HỆ (Wiring) ---
+
+' Program nằm trên cùng, gọi xuống 3 ông quản lý
+Program ..> EmployeeManagement : creates
+Program ..> SalaryManagement : creates
+Program ..> AttendanceManagement : creates
+
+' Management gọi thẳng xuống DAO (Đường dây chính)
+EmployeeManagement --> EmployeeDAO : uses
+SalaryManagement --> EmployeeDAO : uses
+SalaryManagement --> AttendanceDAO : uses
+AttendanceManagement --> AttendanceDAO : uses
+AttendanceManagement --> EmployeeDAO : uses (check ID)
+
+' DAO chứa Entity (Composition)
+EmployeeDAO o-- Employee : manages
+AttendanceDAO o-- Attendance : manages
+
+' Utilities (Dùng nét đứt và gom nhóm để không rối)
+' Mẹo: Vẽ từ dưới lên hoặc từ bên cạnh để tránh cắt ngang hình
+DataInput <.. EmployeeManagement
+DataInput <.. AttendanceManagement
+DataInput <.. SalaryManagement
+
+Menu <.. EmployeeManagement
+Menu <.. AttendanceManagement
+Menu <.. SalaryManagement
+
+@enduml
