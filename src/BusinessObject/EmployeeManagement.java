@@ -15,13 +15,13 @@ public class EmployeeManagement {
 
     public void process() {
         while (true) {
-            // Thêm chức năng Search vào menu
+            
             Menu.print("\n--- EMPLOYEE MENU ---|1. Add|2. Update|3. Remove|4. Search|5. List|6. Back");
             int choice = DataInput.getInteger("");
             if (choice == 1) addNew();
             else if (choice == 2) update();
             else if (choice == 3) remove();
-            else if (choice == 4) search(); // Gọi hàm tìm kiếm
+            else if (choice == 4) search(); 
             else if (choice == 5) list();
             else if (choice == 6) break;
         }
