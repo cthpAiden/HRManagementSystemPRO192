@@ -49,11 +49,17 @@ public class EmployeeManagement {
     }
 
     public void list() {
-        System.out.println("LIST OF EMPLOYEES:");
+        System.out.println("\nLIST OF EMPLOYEES:");
         List<Employee> list = dao.getEmployees();
+        
         if (list.isEmpty()) {
             System.out.println("No employees found.");
         } else {
+            System.out.format("%-8s | %-20s | %-10s | %-12s | %-10s | %s%n",
+                              "ID", "Name", "Dept", "Date", "Salary", "Status");
+            
+            System.out.println("--------------------------------------------------------------------------------");
+
             for (Employee e : list) {
                 System.out.println(e);
             }
