@@ -23,7 +23,7 @@ public class DataInput {
                 System.out.print(msg);
                 return Double.parseDouble(sc.nextLine().trim());
             } catch (Exception e) {
-                System.out.println(">> Sai dinh dang so! Nhap lai.");
+                System.out.println(">> Wrong format! Please input again.");
             }
         }
     }
@@ -40,7 +40,7 @@ public class DataInput {
                 String s = sc.nextLine().trim();
                 return LocalDate.parse(s, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             } catch (Exception e) {
-                System.out.println(">> Sai ngay (dd/MM/yyyy)! Nhap lai.");
+                System.out.println(">> Wrong date format (dd/MM/yyyy)! Please input again.");
             }
         }
     }
